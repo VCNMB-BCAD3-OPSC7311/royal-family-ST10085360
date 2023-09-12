@@ -9,15 +9,13 @@ namespace FamilyTree
     public partial class Form1 : Form
     {
         private Tree<String> familyTree;
+        //List for storing all the nodes and their names for the combobox
         private BindingList<TreeNode<String>> familyMemberList = new BindingList<TreeNode<String>>();
 
 
         public Form1()
         {
             InitializeComponent();
-
-
-
         }
 
         private void btnAdd_Click(object sender, EventArgs e)
@@ -50,9 +48,10 @@ namespace FamilyTree
                 selectedParent.Children.Add(newMember);
             }
 
+            //populate the tree view
             PopulateTreeView(familyTree.Root, null);
 
-
+            //Update the combobox
             cmbPred.DataSource = familyMemberList;
             cmbPred.DisplayMember = "Data";
             cmbPred.ValueMember = "Data";
@@ -94,12 +93,14 @@ namespace FamilyTree
                 familyTree = new Tree<String>();
                 familyTree.Root = monarch;
 
-                // Add the monarch to the TreeView.
                 TreeNode treeNode = new TreeNode(monarch.Data.ToString());
                 TreeView.Nodes.Add(treeNode);
 
+                //Adding members to the binding list
                 familyMemberList.Add(monarch);
             }
+
+            //Update the combobox
             cmbPred.DataSource = familyMemberList;
             cmbPred.DisplayMember = "Data";
             cmbPred.ValueMember = "Data";
@@ -118,24 +119,16 @@ namespace FamilyTree
             {
                 TreeNode[] foundNodes = TreeView.Nodes.Find(node.Data.ToString(), true);
 
-                if (foundNodes.Length > 0)
-                {
-                    TreeNode treeNode = foundNodes[0];
-                    treeNode.Expand(); // Expand the node.
-                    TreeView.SelectedNode = treeNode;
-                }
 
                 parent = node.Parent;
                 return node;
             }
 
-            // Search in the children recursively.
             foreach (var child in node.Children)
             {
                 TreeNode<String> result = FindAndHighlightMember(child, nameToFind, ref parent);
                 if (result != null)
                 {
-                    // If the member is found in the child's subtree, return it.
                     return result;
                 }
             }
@@ -143,28 +136,23 @@ namespace FamilyTree
             return null;
         }
 
+
+        //This method displays a messagebox when a member is found
         private void SearchForMemberAndHighlight(string nameToFind)
         {
-            // Start the search from the root of the tree.
-            TreeNode<String> parent = null; // Initialize the parent as null.
+            TreeNode<String> parent = null; 
             TreeNode<String> foundNode = FindAndHighlightMember(familyTree.Root, nameToFind, ref parent);
 
             if (foundNode != null)
             {
-                // Display a message with the found member's name and its parent's name (predecessor).
                 string message = $"Member \"{nameToFind}\" was found. Predecessor is \"{parent?.Data}\".";
                 MessageBox.Show(message);
             }
             else
             {
-                // Display a message if the member was not found.
                 MessageBox.Show($"Member \"{nameToFind}\" was not found.");
             }
         }
-
-        // Example usage:
-        
-
         private void button1_Click(object sender, EventArgs e)
         {
             string nameToFind = txtSearch.Text;
