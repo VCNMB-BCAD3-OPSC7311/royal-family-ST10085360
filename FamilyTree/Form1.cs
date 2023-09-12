@@ -107,7 +107,7 @@ namespace FamilyTree
 
         }
 
-        private TreeNode<String> FindAndHighlightMember(TreeNode<String> node, string nameToFind)
+        private TreeNode<String> FindAndHighlightMember(TreeNode<String> node, string nameToFind, ref TreeNode<String> parent)
         {
             if (node == null)
             {
@@ -118,7 +118,6 @@ namespace FamilyTree
             {
                 TreeNode[] foundNodes = TreeView.Nodes.Find(node.Data.ToString(), true);
 
-                // Check if a matching node was found before accessing it.
                 if (foundNodes.Length > 0)
                 {
                     TreeNode treeNode = foundNodes[0];
@@ -126,13 +125,14 @@ namespace FamilyTree
                     TreeView.SelectedNode = treeNode;
                 }
 
+                parent = node.Parent;
                 return node;
             }
 
             // Search in the children recursively.
             foreach (var child in node.Children)
             {
-                TreeNode<String> result = FindAndHighlightMember(child, nameToFind);
+                TreeNode<String> result = FindAndHighlightMember(child, nameToFind, ref parent);
                 if (result != null)
                 {
                     // If the member is found in the child's subtree, return it.
@@ -146,7 +146,20 @@ namespace FamilyTree
         private void SearchForMemberAndHighlight(string nameToFind)
         {
             // Start the search from the root of the tree.
-            FindAndHighlightMember(familyTree.Root, nameToFind);
+            TreeNode<String> parent = null; // Initialize the parent as null.
+            TreeNode<String> foundNode = FindAndHighlightMember(familyTree.Root, nameToFind, ref parent);
+
+            if (foundNode != null)
+            {
+                // Display a message with the found member's name and its parent's name (predecessor).
+                string message = $"Member \"{nameToFind}\" was found. Predecessor is \"{parent?.Data}\".";
+                MessageBox.Show(message);
+            }
+            else
+            {
+                // Display a message if the member was not found.
+                MessageBox.Show($"Member \"{nameToFind}\" was not found.");
+            }
         }
 
         // Example usage:
